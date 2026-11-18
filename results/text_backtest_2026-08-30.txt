@@ -1,0 +1,69 @@
+==========================================================================
+BACKTEST: filing-language change ('Lazy Prices')
+==========================================================================
+
+11,847 filing pairs, 577 companies, 2020-09-02 to 2026-08-27
+forms: {'10-Q': np.int64(8911), '10-K': np.int64(2936)}
+similarity: mean 0.811  std 0.102  p10 0.691  p90 0.917
+
+ranked within month x form: 11,843 observations
+
+Q1 = most changed language, Q5 = least changed.
+Lazy Prices predicts Q1 underperforms, i.e. a POSITIVE Q5-Q1 spread.
+
+--- mean forward return by similarity quintile (%) ---
+           Q1    Q2    Q3    Q4    Q5  Q5-Q1         t      n
+horizon                                                      
+5       -0.63 -0.56 -0.17  0.17  0.02   0.65  1.824045  11836
+10      -0.98 -0.42 -0.32  0.09 -0.17   0.82  2.021461  11802
+20      -1.36  0.40 -0.05  0.18  0.33   1.69  2.871180  11460
+40      -3.43 -0.61  0.02  0.36  0.02   3.45  3.754926  11336
+60      -4.36 -0.89 -0.69 -0.04 -0.34   4.02  3.046710  11300
+  t is on the Q5-Q1 spread, clustered by entry month.
+
+--- PLACEBO: similarity shuffled within month, 20-day hold ---
+  observed +1.69%   placebo -0.02% +/- 0.62%   p=0.005
+
+--- BY MARKET CAP: Q5-Q1 spread, 20-day hold (%) ---
+         spread         t     n
+band                           
+<300M      2.11  1.549704  2902
+300M-1B    1.47  1.028271  1974
+1-2B       2.46  1.261139  1107
+2-10B      1.84  1.802342  2384
+>10B       0.78  0.548061  1827
+
+--- YEAR BY YEAR: Q5-Q1 spread, 20-day hold (%) ---
+      spread         t     n
+year                        
+2020    3.09  5.997108   428
+2021    5.30  2.794403  1666
+2022    1.17  1.012299  1900
+2023    1.76  1.397099  2038
+2024    2.23  1.778548  2091
+2025   -0.96 -0.620570  2132
+2026   -0.91 -1.039401  1205
+
+--- TRADEABILITY ---
+filter                                   n    Q5-Q1       t   Q5 only
+all pairs                           11,843    1.69%    2.87     0.33%
+price >= $5                          9,765    1.39%    1.97    -0.14%
++ $1M/day volume                     7,902    0.10%    0.14    -0.66%
++ $300M-$2B cap                      2,352   -1.25%   -1.07    -1.42%
+
+--- MULTIPLE TESTING ---
+  5 horizons plus size, year, and tradeability breakdowns.
+  A real effect should hold across horizons and survive the placebo.
+
+================================================================
+ROBUSTNESS: IS IT A COVID-ERA ARTIFACT?  (20-day hold)
+================================================================
+  full sample 2020-2026    n=11,460  Q5-Q1=  1.69%  t= 2.87  placebo p=0.005
+  excluding 2020-2021      n= 9,366  Q5-Q1=  0.80%  t= 1.36  placebo p=0.220
+  2020-2021 only           n= 2,094  Q5-Q1=  4.75%  t= 3.31  placebo p=0.000
+  2023 onward              n= 7,466  Q5-Q1=  0.70%  t= 1.01  placebo p=0.475
+
+  Mechanism: in 2020-2021 companies rewrote risk factors en masse to add
+  COVID language. How much a firm rewrote proxied for COVID exposure, and
+  COVID exposure predicted returns. The signal is that confound, not
+  investor inattention to language change.

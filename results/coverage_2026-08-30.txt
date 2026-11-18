@@ -1,0 +1,32 @@
+WHY THE BACKTEST LOST 19,776 EVENTS  (interim - before fetcher fix)
+==================================================================
+dropped events: 19,776   companies: 1,531
+
+classification (events):
+  renamed                8,315   42.0%
+  delisted               7,544   38.1%
+  still listed           3,595   18.2%
+  deregistered             181    0.9%
+  no ticker on file        141    0.7%
+
+delistings, lag from earnings event:
+  before the event          62
+  0-30d                     73
+  30-90d                   231
+  90d-1y                 1,374
+  1-2y                   1,872
+  >2y                    3,932
+
+traded >90d past the event: 7,178 (36.3%)
+
+public float of delisted companies at event:
+  <$50M                    893   13.1%
+  $50-300M               1,982   29.1%
+  $300M-1B               1,798   26.4%
+  $1-2B                    927   13.6%
+  >$2B                   1,214   17.8%
+
+median float $437M | in $300M-2B band: 2,740 events
+
+CAVEAT: the 'still listed' bucket was later shown to be a fetcher bug --
+8 of 10 sampled had full history when requested individually. Rerunning.

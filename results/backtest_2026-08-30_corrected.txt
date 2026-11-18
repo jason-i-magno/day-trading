@@ -1,0 +1,99 @@
+coverage:
+                      events: 91,866
+                     tickers: 4,827
+           dropped_no_prices: 12,076
+          dropped_bad_window: 1,158
+                        kept: 78,632
+  diag_events_without_shares: 9,537
+               TOTAL DROPPED: 13,234 (14.4%)
+     no market cap available: 9,537 (10.4%) - excluded by cap filter, not by coverage
+
+panel saved to .cache/panel.parquet
+
+==========================================================================
+BACKTEST: post-earnings-announcement drift
+==========================================================================
+
+full event panel: 78,632 events -> 78,632 with quintiles
+after screen filters ($300M-$2.0B cap, $1M+ volume, $5+ price): 16,640 events
+
+--- ALL EVENTS: mean forward return by reaction quintile (%) ---
+           Q1    Q2    Q3    Q4    Q5  Q5-Q1         t      n
+horizon                                                      
+5       -0.31 -0.40 -0.08 -0.30  0.01   0.32  1.792418  78632
+10      -0.53 -0.78 -0.42 -0.47 -0.19   0.34  1.454315  78632
+20      -0.92 -0.86 -0.60 -0.54 -0.08   0.84  2.623803  78632
+40      -2.72 -1.93 -1.51 -1.44 -1.07   1.65  4.152485  78632
+60      -3.86 -3.18 -2.30 -2.17 -1.80   2.06  4.182604  78629
+  Q1 = weakest reaction, Q5 = strongest. t is on the Q5-Q1 spread,
+  clustered by entry month. |t| > 1.96 is significant at 5%.
+
+--- SCREEN UNIVERSE: mean forward return by reaction quintile (%) ---
+           Q1    Q2    Q3    Q4    Q5  Q5-Q1         t      n
+horizon                                                      
+5       -0.20 -0.28 -0.18 -0.40 -0.54  -0.34 -0.832774  16640
+10      -0.49 -0.61 -0.36 -0.67 -0.57  -0.08 -0.175588  16640
+20      -0.76 -0.85 -0.38 -0.58 -0.64   0.12  0.194222  16640
+40      -2.08 -1.67 -0.93 -1.13 -1.84   0.24  0.303402  16640
+60      -3.07 -2.36 -1.89 -2.18 -2.40   0.67  0.648368  16638
+  Q1 = weakest reaction, Q5 = strongest. t is on the Q5-Q1 spread,
+  clustered by entry month. |t| > 1.96 is significant at 5%.
+
+--- COST SENSITIVITY: top quintile, 20-day hold ---
+                net_per_trade  annualised
+round_trip_bps                           
+0                       -0.64       -7.76
+10                      -0.74       -8.93
+25                      -0.89      -10.65
+50                      -1.14      -13.45
+100                     -1.64      -18.80
+
+--- YEAR BY YEAR: Q5-Q1 spread, 20-day hold (%) ---
+      spread         t     n
+year                        
+2021   -0.85 -0.701152  2850
+2022    1.32  0.778265  2980
+2023    0.56  0.363406  2957
+2024    0.29  0.293755  2976
+2025   -0.07 -0.037582  3209
+2026   -1.41 -2.018176  1668
+
+--- BY MARKET CAP: Q5-Q1 spread, 20-day hold (%), all events ---
+         spread         t      n
+band                            
+<300M      2.82  4.103240  16715
+300M-1B   -1.15 -1.677267  12605
+1-2B       0.84  0.957687   8320
+2-10B      0.37  0.654801  17641
+>10B       0.40  0.564983  12790
+
+--- PLACEBO: reactions shuffled within month, 20-day hold ---
+        all events: observed +0.84%  placebo +0.01% +/- 0.22%  p=0.000
+   screen universe: observed +0.12%  placebo +0.00% +/- 0.45%  p=0.810
+  p is the share of shuffles producing a spread at least this large.
+  A real effect should be rare under the null; p > 0.05 means it is not.
+
+--- MULTIPLE TESTING ---
+  This report evaluates 5 horizons x 2 universes = 10 primary tests, plus per-year and per-size breakdowns.
+  At 5% significance, roughly 1 in 20 will look significant by chance.
+  Treat any single starred result with suspicion unless it holds across
+  horizons, years, and the placebo test.
+
+================================================================
+TRADEABILITY OF THE SUB-$300M EFFECT
+================================================================
+filter                                       n    Q5-Q1       t   Q5 only
+all sub-$300M                           16,715    2.44%    3.63     1.77%
++ price >= $5                            8,834    2.84%    3.43     1.15%
++ price >= $5, $500k/day vol             4,219    2.77%    2.05     0.79%
++ price >= $5, $1M/day vol               2,608    2.00%    1.16    -0.42%
+
+Liquidity of the sub-$300M band:
+  median daily dollar volume  $402,529
+  share above $1M/day         29.8%
+  priced under $5             47.1%
+
+SUPERSEDES results/backtest_2026-08-30.txt, which was contaminated by
+corrupt prices (a negative close on CODQL producing a -745% return) and
+un-winsorized microcap outliers (+66,000% on a $0.0009 stock). Those
+outliers destroyed the quintile ordering and produced a false null.

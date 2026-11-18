@@ -1,0 +1,28 @@
+[project]
+name = "day-trading-screener"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "httpx>=0.28.1",
+    "pandas>=3.0.5",
+    "pyarrow>=25.0.1",
+    "yfinance>=1.7.0",
+]
+
+[project.scripts]
+screener = "screener.cli:main"
+backtest = "screener.backtest.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/screener"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

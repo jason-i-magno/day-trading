@@ -1,0 +1,87 @@
+coverage:
+                      events: 91,866
+                     tickers: 4,827
+           dropped_no_prices: 19,679
+          dropped_bad_window: 683
+                        kept: 71,504
+  diag_events_without_shares: 8,319
+               TOTAL DROPPED: 20,362 (22.2%)
+     no market cap available: 8,319 (9.1%) - excluded by cap filter, not by coverage
+
+panel saved to .cache/panel.parquet
+
+==========================================================================
+BACKTEST: post-earnings-announcement drift
+==========================================================================
+
+full event panel: 71,504 events -> 71,504 with quintiles
+after screen filters ($300M-$2.0B cap, $1M+ volume, $5+ price): 15,505 events
+
+--- ALL EVENTS: mean forward return by reaction quintile (%) ---
+           Q1    Q2    Q3    Q4    Q5  Q5-Q1         t      n
+horizon                                                      
+5        0.69  0.27  0.09 -0.26  0.27  -0.43 -0.505920  71504
+10       0.66 -0.11 -0.17 -0.45  0.08  -0.58 -0.714418  71504
+20       0.40 -0.06 -0.31 -0.28  0.37  -0.03 -0.034772  71504
+40      -1.14 -0.99 -1.06 -1.14 -0.25   0.89  0.927892  71504
+60      -1.60 -1.99 -1.62 -1.68 -0.70   0.89  0.824859  71502
+  Q1 = weakest reaction, Q5 = strongest. t is on the Q5-Q1 spread,
+  clustered by entry month. |t| > 1.96 is significant at 5%.
+
+--- SCREEN UNIVERSE: mean forward return by reaction quintile (%) ---
+           Q1    Q2    Q3    Q4    Q5  Q5-Q1         t      n
+horizon                                                      
+5       -0.13 -0.24 -0.16 -0.54 -0.39  -0.25 -0.589578  15505
+10      -0.54 -0.63 -0.41 -0.76 -0.59  -0.05 -0.109414  15505
+20      -0.68 -0.54 -0.52 -0.63 -0.56   0.12  0.184005  15505
+40      -1.72 -1.32 -1.18 -1.10 -1.95  -0.23 -0.280076  15505
+60      -2.67 -1.94 -2.24 -1.73 -2.79  -0.12 -0.111725  15504
+  Q1 = weakest reaction, Q5 = strongest. t is on the Q5-Q1 spread,
+  clustered by entry month. |t| > 1.96 is significant at 5%.
+
+--- COST SENSITIVITY: top quintile, 20-day hold ---
+                net_per_trade  annualised
+round_trip_bps                           
+0                       -0.56       -6.80
+10                      -0.66       -7.97
+25                      -0.81       -9.71
+50                      -1.06      -12.53
+100                     -1.56      -17.94
+
+--- YEAR BY YEAR: Q5-Q1 spread, 20-day hold (%) ---
+      spread         t     n
+year                        
+2021   -0.94 -0.705531  2847
+2022    1.57  0.860286  2886
+2023    1.08  0.738043  2827
+2024    0.97  1.001976  2750
+2025   -1.48 -0.692638  2812
+2026   -1.31 -1.254297  1383
+
+--- BY MARKET CAP: Q5-Q1 spread, 20-day hold (%), all events ---
+         spread         t      n
+band                            
+<300M      2.82  2.778222  14193
+300M-1B   -4.73 -1.373410  11411
+1-2B       0.86  0.982178   7684
+2-10B      0.38  0.594308  16732
+>10B       0.51  0.741320  12324
+
+--- PLACEBO: reactions shuffled within month, 20-day hold ---
+        all events: observed -0.03%  placebo +0.03% +/- 0.55%  p=0.975
+   screen universe: observed +0.12%  placebo +0.03% +/- 0.47%  p=0.820
+  p is the share of shuffles producing a spread at least this large.
+  A real effect should be rare under the null; p > 0.05 means it is not.
+
+--- MULTIPLE TESTING ---
+  This report evaluates 5 horizons x 2 universes = 10 primary tests, plus per-year and per-size breakdowns.
+  At 5% significance, roughly 1 in 20 will look significant by chance.
+  Treat any single starred result with suspicion unless it holds across
+  horizons, years, and the placebo test.
+
+Run metadata
+  events collected : 91,866 earnings 8-Ks, 2021-01-01 to 2026-05-15
+  unique tickers   : 4,827
+  panel rows       : 71,504 (22.2% dropped, mostly missing prices for delisted names)
+  price coverage   : 3,007 of 3,566 tickers in first sweep (15.7% unavailable)
+  min detectable   : 1.32% per 20-day trade at 2 sigma (65 monthly observations)
